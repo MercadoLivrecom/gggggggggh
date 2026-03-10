@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="30">
+    <title>Instabilidade no Sistema | Estamos de volta em breve!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+        
+        .status {
+            background: #fff8e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .countdown {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .refresh-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .footer-note {
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .emoji {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="icon">🚧</div>
+        <h1>Estamos com instabilidade</h1>
+        
+        <p>Nossa equipe está trabalhando duro para resolver uma <strong>instabilidade temporária</strong> no sistema.</p>
+        
+        <div class="status">
+            <p><span class="emoji">💡</span> <strong>Status atual:</strong> Sistema em manutenção preventiva</p>
+            <p><span class="emoji">⏱️</span> <strong>Tempo estimado:</strong> Até 5 minutos</p>
+        </div>
+        
+        <p>Não se preocupe, seus dados estão seguros conosco. Estamos otimizando a infraestrutura para oferecer um serviço ainda mais estável.</p>
+        
+        <p>Tentando reconectar automaticamente em: <br>
+        <span class="countdown" id="countdown">30</span> segundos</p>
+        
+        <button class="refresh-btn" onclick="location.reload()">
+            Atualizar agora
+        </button>
+        
+        <p class="footer-note">
+            Enquanto isso, que tal <span class="emoji">☕</span> tomar um café? 
+            Estamos de volta antes que você termine de saboreá-lo!
+        </p>
+    </div>
+
+    <script>
+        // Contagem regressiva
+        let timeLeft = 30;
+        const countdownElement = document.getElementById('countdown');
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+        
+        // Mensagem de console amigável
+        console.log(`%cOps! Parece que estamos com instabilidade no momento. 
+        Não se preocupe, nossa equipe já está resolvendo! 🚧`, 
+        'color: #e74c3c; font-size: 16px; font-weight: bold;');
+    </script>
+</body>
+</html>
